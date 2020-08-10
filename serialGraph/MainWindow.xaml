@@ -7,8 +7,10 @@
         mc:Ignorable="d"
         Title="串口" Height="450" Width="800">
     <Grid>
-
-        <d3:Chart Name="D3Chart"  LegendVisibility="Hidden" IsAutoFitEnabled="True" 
+        <Grid.Resources>
+            <local:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter"/>
+        </Grid.Resources>
+        <d3:Chart Name="D3Chart"  LegendVisibility="Visible" IsAutoFitEnabled="True" 
                   Foreground="#FF898989"  Grid.Row="1"
                   Background="#FFF1F1F1">
             <d3:Chart.LegendContent>

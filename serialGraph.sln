@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "serialGraph", "serialGraph.csproj", "{71CA0B17-4B3C-4F9B-8F7C-9E1810AEA93B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "serialGraph", "serialGraph\serialGraph.csproj", "{71CA0B17-4B3C-4F9B-8F7C-9E1810AEA93B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

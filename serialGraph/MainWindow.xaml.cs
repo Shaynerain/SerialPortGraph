@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using InteractiveDataDisplay.WPF;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,10 +31,9 @@ namespace serialGraph
 
             InitConfig();
 
-            //InitJsonFile();
+            //GreatConfigJsonFile();
 
-
-            //设置时间，秒数，精确到最接近的毫秒，0.5就是500ms  
+            //设置时间，秒数，精确到最接近的毫秒
             Timer.Interval = TimeSpan.FromSeconds(0.01);
             //设置触发时间  
             Timer.Tick += Timer_Tick;
@@ -55,55 +55,75 @@ namespace serialGraph
             catch (Exception e)
             {
                 MessageBox.Show(e.ToString());
+                Close();
             }
             if (Configs != null)
             {
+                InitLines();
+
                 serialPort.PortName = Configs.PortName;
                 serialPort.BaudRate = Configs.BaudRate;
+                serialPort.ReadTimeout = 10;
                 serialPort.DataReceived -= SerialPort_DataReceived;
                 serialPort.DataReceived += SerialPort_DataReceived;
                 try
                 {
-                    serialPort.Open();
+                    //serialPort.Open();
                 }
                 catch(Exception e)
                 {
                     MessageBox.Show(e.ToString());
+                    Close();
                 }
-
 
                 //if (serialPort.IsOpen())
                 //{
                 //}
             }
         }
+        private List<int> xList = new List<int>();
+        private void InitLines()
+        {
+            for (int i = 0; i < Configs.Length; i++)
+            {
+                xList.Add(i);
+            }
+            foreach (var line in Configs.GraphConfigs)
+            {
+                LineGraph lineGraph = new LineGraph();
+                lineGraph.Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString(line.Color));
+                lineGraph.Description = line.Name;
+                lineGraph.StrokeThickness = line.Thickness;
+                if (line.Visibility)
+                    lineGraph.Visibility = Visibility.Visible;
+                else
+                    lineGraph.Visibility = Visibility.Hidden;
+                line.Data = new List<double>();
+                for (int i = 0; i < Configs.Length; i++)
+                {
+                    line.Data.Add(0);
+                }
+                lineGraph.Plot(xList, line.Data);
+                Lines.Children.Add(lineGraph);
+            }
+        }
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            int count = serialPort.BytesToRead;
-            byte[] rbuf = new byte[count];
-            serialPort.Read(rbuf, 0, count);
-        }
-
-        void InitJsonFile()
-        {
-            Configs = new ConfigJson();
-            Configs.BaudRate = 1000000;
-            Configs.PortName = "COM1";
-            Configs.GraphConfigs = new List<GraphConfig>();
-            Configs.GraphConfigs.Add(new GraphConfig() { Color = "#FF3333", Factory = 1, OffSet = 0, Thickness = 1, Visibility = true });
-            Configs.GraphConfigs.Add(new GraphConfig() { Color = "#FF3333", Factory = 1, OffSet = 0, Thickness = 1, Visibility = true });
-            string f = JsonConvert.SerializeObject(Configs);
-            File.WriteAllText("config.json", f, Encoding.Default);
+            string str = serialPort.ReadLine();
+            Console.WriteLine(str);
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-
-
+            for (int i = 0; i < Lines.Children.Count; i++)
+            {
+                if(Lines.Children[i] is LineGraph lineGraph)
+                {
+                    lineGraph.Plot(xList, Configs.GraphConfigs[i].Data);
+                }
+            }
         }
-
-
     }
 
     public class ConfigJson
@@ -120,8 +140,10 @@ namespace serialGraph
 
     public class GraphConfig
     {
-        //public string Name { get; set; }
+        //线的名字
+        public string Name { get; set; }
         //public int Address { get; set; }
+
         public string Color { get; set; }
         public int Thickness { get; set; }
         public int Factory { get; set; }
