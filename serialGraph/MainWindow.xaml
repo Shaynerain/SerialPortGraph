@@ -7,11 +7,15 @@
         mc:Ignorable="d"
         Title="串口" Height="450" Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="20"></RowDefinition>
+        </Grid.RowDefinitions>
         <Grid.Resources>
             <local:VisibilityToCheckedConverter x:Key="VisibilityToCheckedConverter"/>
         </Grid.Resources>
-        <d3:Chart Name="D3Chart"  LegendVisibility="Visible" IsAutoFitEnabled="True" 
-                  Foreground="#FF898989"  Grid.Row="1"
+        <d3:Chart Name="D3Chart"  LegendVisibility="Visible" IsAutoFitEnabled="True" MouseDoubleClick="D3Chart_MouseDoubleClick"
+                  Foreground="#FF898989"  Grid.Row="0"
                   Background="#FFF1F1F1">
             <d3:Chart.LegendContent>
                 <d3:LegendItemsPanel>
@@ -31,5 +35,6 @@
                 <!--<d3:PlotAxis AxisOrientation="Left"></d3:PlotAxis>-->
             </Grid>
         </d3:Chart>
+        <TextBlock Name="textBlock" Grid.Row="1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
     </Grid>
 </Window>

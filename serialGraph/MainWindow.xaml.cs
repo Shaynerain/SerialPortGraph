@@ -13,6 +13,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -63,12 +64,12 @@ namespace serialGraph
 
                 serialPort.PortName = Configs.PortName;
                 serialPort.BaudRate = Configs.BaudRate;
-                serialPort.ReadTimeout = 10;
+                serialPort.ReadTimeout = 500;
                 serialPort.DataReceived -= SerialPort_DataReceived;
                 serialPort.DataReceived += SerialPort_DataReceived;
                 try
                 {
-                    //serialPort.Open();
+                    serialPort.Open();
                 }
                 catch(Exception e)
                 {
@@ -99,6 +100,7 @@ namespace serialGraph
                 else
                     lineGraph.Visibility = Visibility.Hidden;
                 line.Data = new List<double>();
+                line.tempData = new List<double>();
                 for (int i = 0; i < Configs.Length; i++)
                 {
                     line.Data.Add(0);
@@ -110,8 +112,36 @@ namespace serialGraph
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            string str = serialPort.ReadLine();
-            Console.WriteLine(str);
+            string str = null;
+            try
+            {
+                str = serialPort.ReadLine();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+                return;
+            }
+            Dispatcher.Invoke(new Action(() => { 
+                textBlock.Text = str; 
+            }));
+            
+            foreach (var line in Configs.GraphConfigs)
+            {
+                if (str.Contains(line.Name))
+                {
+                    int index = str.IndexOf('=');
+                    int flag = str.IndexOf(';');
+                    if (index > -1 && flag > -1)
+                    {
+                        string value;
+                        value = str.Substring(index + 1,flag - index - 1);
+                        str = str.Substring(flag + 1);
+                        line.tempData.Add(double.Parse(value));
+                    }
+                }
+            }
+
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -120,9 +150,25 @@ namespace serialGraph
             {
                 if(Lines.Children[i] is LineGraph lineGraph)
                 {
+                    Configs.GraphConfigs[i].Data.AddRange(Configs.GraphConfigs[i].tempData);
+                    Configs.GraphConfigs[i].tempData.Clear();
+                    Configs.GraphConfigs[i].Data.RemoveRange(0, Configs.GraphConfigs[i].Data.Count - Configs.Length);
                     lineGraph.Plot(xList, Configs.GraphConfigs[i].Data);
                 }
             }
+        }
+
+        private void D3Chart_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            //自动填充切换
+            D3Chart.IsAutoFitEnabled = !D3Chart.IsAutoFitEnabled;
+
+            if(!D3Chart.IsAutoFitEnabled)
+            {
+                D3Chart.PlotHeight = 1000;
+                D3Chart.PlotWidth = 1000;
+            }
+
         }
     }
 
@@ -150,6 +196,7 @@ namespace serialGraph
         public int OffSet { get; set; }
         public bool Visibility { get; set; }
         public List<double> Data { get; set; }
+        public List<double> tempData { get; set; }
     }
 
     public class VisibilityToCheckedConverter : IValueConverter
