@@ -41,7 +41,7 @@ namespace serialGraph
             Timer.Start();
         }
 
-        DispatcherTimer Timer = new DispatcherTimer();
+        DispatcherTimer Timer = new DispatcherTimer(DispatcherPriority.DataBind);
         SerialPort serialPort = new SerialPort();
 
         ConfigJson Configs = null;
@@ -124,7 +124,7 @@ namespace serialGraph
             }
             Dispatcher.Invoke(new Action(() => { 
                 textBlock.Text = str; 
-            }));
+            }), DispatcherPriority.DataBind);
             
             foreach (var line in Configs.GraphConfigs)
             {
@@ -137,12 +137,17 @@ namespace serialGraph
                         string value;
                         value = str.Substring(index + 1,flag - index - 1);
                         str = str.Substring(flag + 1);
-                        line.tempData.Add(double.Parse(value));
+                        lock (locker)
+                        {
+                            line.tempData.Add(double.Parse(value));
+                        }
                     }
                 }
             }
 
         }
+
+        private static readonly object locker = new object();
 
         private void Timer_Tick(object sender, EventArgs e)
         {
@@ -150,8 +155,11 @@ namespace serialGraph
             {
                 if(Lines.Children[i] is LineGraph lineGraph)
                 {
-                    Configs.GraphConfigs[i].Data.AddRange(Configs.GraphConfigs[i].tempData);
-                    Configs.GraphConfigs[i].tempData.Clear();
+                    lock (locker)
+                    {
+                        Configs.GraphConfigs[i].Data.AddRange(Configs.GraphConfigs[i].tempData);
+                        Configs.GraphConfigs[i].tempData.Clear();
+                    }
                     Configs.GraphConfigs[i].Data.RemoveRange(0, Configs.GraphConfigs[i].Data.Count - Configs.Length);
                     lineGraph.Plot(xList, Configs.GraphConfigs[i].Data);
                 }

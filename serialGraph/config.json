@@ -1,5 +1,5 @@
 {
-	"PortName": "COM10",
+	"PortName": "COM11",
 	"BaudRate": 1000000,
 	"Length": 1000,
 	"GraphConfigs": [
