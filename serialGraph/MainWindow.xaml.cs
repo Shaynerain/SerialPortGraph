@@ -1,4 +1,5 @@
 ﻿using InteractiveDataDisplay.WPF;
+using MahApps.Metro.Controls;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -24,13 +25,13 @@ namespace serialGraph
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : MetroWindow
     {
         public MainWindow()
         {
             InitializeComponent();
 
-            InitConfig();
+            //InitConfig();
 
             //GreatConfigJsonFile();
 
@@ -148,7 +149,7 @@ namespace serialGraph
         }
 
         private static readonly object locker = new object();
-
+        private bool Pause = false;
         private void Timer_Tick(object sender, EventArgs e)
         {
             for (int i = 0; i < Lines.Children.Count; i++)
@@ -161,7 +162,8 @@ namespace serialGraph
                         Configs.GraphConfigs[i].tempData.Clear();
                     }
                     Configs.GraphConfigs[i].Data.RemoveRange(0, Configs.GraphConfigs[i].Data.Count - Configs.Length);
-                    lineGraph.Plot(xList, Configs.GraphConfigs[i].Data);
+                    if(!Pause)
+                        lineGraph.Plot(xList, Configs.GraphConfigs[i].Data);
                 }
             }
         }
@@ -177,6 +179,14 @@ namespace serialGraph
                 D3Chart.PlotWidth = 1000;
             }
 
+        }
+
+        private void D3Chart_KeyUp(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Space)
+            {
+                Pause = !Pause;
+            }
         }
     }
 
