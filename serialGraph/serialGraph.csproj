@@ -145,6 +145,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CommandBinding.cs" />
+    <Compile Include="ConfigJson.cs" />
+    <Compile Include="DataBinding.cs" />
+    <Compile Include="GraphConfig.cs" />
+    <Compile Include="ObservableObject.cs" />
+    <Compile Include="RelayCommand.cs" />
+    <Compile Include="VisibilityToCheckedConverter.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

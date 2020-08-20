@@ -3,6 +3,8 @@ using MahApps.Metro.Controls;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
@@ -31,8 +33,10 @@ namespace serialGraph
         {
             InitializeComponent();
 
-            //InitConfig();
+            this.DataContext = DataBinding._DataBinding;
 
+            InitConfig();
+            InitUI();
             //GreatConfigJsonFile();
 
             //设置时间，秒数，精确到最接近的毫秒
@@ -40,10 +44,50 @@ namespace serialGraph
             //设置触发时间  
             Timer.Tick += Timer_Tick;
             Timer.Start();
+
+            DataBinding._DataBinding.ReCount = 10;
+        }
+
+        private void InitUI()
+        { 
+
+            foreach (var item in SerialPort.GetPortNames())
+            {
+                SerialPortComboBox.Items.Add(item);
+            }
+            for (int i = 5; i <= 8; i++)
+            {
+                DataBitsComboBox.Items.Add(i);
+            }
+
+            if (Configs != null)
+            {
+                foreach (var item in Configs.BaudRates)
+                {
+                    BaudRateComboBox.Items.Add(item);
+                }
+                foreach (var item in Enum.GetNames(typeof(Parity)))
+                {
+                    ParityComboBoxItem.Items.Add(item);
+                }
+                foreach (var item in Enum.GetNames(typeof(StopBits)))
+                {
+                    StopBitsComboBoxItem.Items.Add(item);
+                }
+
+                InitLines();
+                SerialPortComboBox.SelectedItem = Configs.PortName;
+
+                BaudRateComboBox.SelectedItem = Configs.BaudRate;
+                DataBitsComboBox.SelectedItem = Configs.DataBits;
+                ParityComboBoxItem.SelectedItem = Configs.Parity;
+                StopBitsComboBoxItem.SelectedItem = Configs.StopBits;
+
+            }
         }
 
         DispatcherTimer Timer = new DispatcherTimer(DispatcherPriority.DataBind);
-        SerialPort serialPort = new SerialPort();
+
 
         ConfigJson Configs = null;
 
@@ -58,29 +102,6 @@ namespace serialGraph
             {
                 MessageBox.Show(e.ToString());
                 Close();
-            }
-            if (Configs != null)
-            {
-                InitLines();
-
-                serialPort.PortName = Configs.PortName;
-                serialPort.BaudRate = Configs.BaudRate;
-                serialPort.ReadTimeout = 500;
-                serialPort.DataReceived -= SerialPort_DataReceived;
-                serialPort.DataReceived += SerialPort_DataReceived;
-                try
-                {
-                    serialPort.Open();
-                }
-                catch(Exception e)
-                {
-                    MessageBox.Show(e.ToString());
-                    Close();
-                }
-
-                //if (serialPort.IsOpen())
-                //{
-                //}
             }
         }
         private List<int> xList = new List<int>();
@@ -116,7 +137,7 @@ namespace serialGraph
             string str = null;
             try
             {
-                str = serialPort.ReadLine();
+                //str = serialPort.ReadLine();
             }
             catch (Exception ex)
             {
@@ -124,7 +145,7 @@ namespace serialGraph
                 return;
             }
             Dispatcher.Invoke(new Action(() => { 
-                textBlock.Text = str; 
+                //textBlock.Text = str; 
             }), DispatcherPriority.DataBind);
             
             foreach (var line in Configs.GraphConfigs)
@@ -145,7 +166,6 @@ namespace serialGraph
                     }
                 }
             }
-
         }
 
         private static readonly object locker = new object();
@@ -166,67 +186,6 @@ namespace serialGraph
                         lineGraph.Plot(xList, Configs.GraphConfigs[i].Data);
                 }
             }
-        }
-
-        private void D3Chart_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            //自动填充切换
-            D3Chart.IsAutoFitEnabled = !D3Chart.IsAutoFitEnabled;
-
-            if(!D3Chart.IsAutoFitEnabled)
-            {
-                D3Chart.PlotHeight = 1000;
-                D3Chart.PlotWidth = 1000;
-            }
-
-        }
-
-        private void D3Chart_KeyUp(object sender, KeyEventArgs e)
-        {
-            if(e.Key == Key.Space)
-            {
-                Pause = !Pause;
-            }
-        }
-    }
-
-    public class ConfigJson
-    {
-        public string PortName { get; set; }
-        public int BaudRate { get; set; }
-
-        /// <summary>
-        /// 线的缓存长度
-        /// </summary>
-        public int Length { get; set; }
-        public List<GraphConfig> GraphConfigs { get; set; }
-    }
-
-    public class GraphConfig
-    {
-        //线的名字
-        public string Name { get; set; }
-        //public int Address { get; set; }
-
-        public string Color { get; set; }
-        public int Thickness { get; set; }
-        public int Factory { get; set; }
-        public int OffSet { get; set; }
-        public bool Visibility { get; set; }
-        public List<double> Data { get; set; }
-        public List<double> tempData { get; set; }
-    }
-
-    public class VisibilityToCheckedConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return ((Visibility)value) == Visibility.Visible;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return ((bool)value) ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 

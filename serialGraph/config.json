@@ -1,7 +1,14 @@
 {
-	"PortName": "COM11",
-	"BaudRate": 1000000,
+	"PortName": "COM13",
+	"BaudRate": 500000,
+	"DataBits": 8,
+	"Parity": "None",
+	"StopBits": "One",
+
+	"BaudRates":[9600,115200,500000,1000000,1500000,2000000],
+
 	"Length": 1000,
+
 	"GraphConfigs": [
 		{
 			"Name": "Line1",
