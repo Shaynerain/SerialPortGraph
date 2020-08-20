@@ -22,6 +22,7 @@ namespace serialGraph
         /// 线的缓存长度
         /// </summary>
         public int Length { get; set; }
+        public int Height { get; set; }
 
         public List<GraphConfig> GraphConfigs { get; set; }
     }

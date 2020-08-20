@@ -45,7 +45,6 @@ namespace serialGraph
             Timer.Tick += Timer_Tick;
             Timer.Start();
 
-            DataBinding._DataBinding.ReCount = 10;
         }
 
         private void InitUI()
@@ -60,9 +59,9 @@ namespace serialGraph
                 DataBitsComboBox.Items.Add(i);
             }
 
-            if (Configs != null)
+            if (DataBinding._DataBinding.Configs != null)
             {
-                foreach (var item in Configs.BaudRates)
+                foreach (var item in DataBinding._DataBinding.Configs.BaudRates)
                 {
                     BaudRateComboBox.Items.Add(item);
                 }
@@ -76,27 +75,24 @@ namespace serialGraph
                 }
 
                 InitLines();
-                SerialPortComboBox.SelectedItem = Configs.PortName;
+                SerialPortComboBox.SelectedItem = DataBinding._DataBinding.Configs.PortName;
 
-                BaudRateComboBox.SelectedItem = Configs.BaudRate;
-                DataBitsComboBox.SelectedItem = Configs.DataBits;
-                ParityComboBoxItem.SelectedItem = Configs.Parity;
-                StopBitsComboBoxItem.SelectedItem = Configs.StopBits;
+                BaudRateComboBox.SelectedItem = DataBinding._DataBinding.Configs.BaudRate;
+                DataBitsComboBox.SelectedItem = DataBinding._DataBinding.Configs.DataBits;
+                ParityComboBoxItem.SelectedItem = DataBinding._DataBinding.Configs.Parity;
+                StopBitsComboBoxItem.SelectedItem = DataBinding._DataBinding.Configs.StopBits;
 
             }
         }
 
         DispatcherTimer Timer = new DispatcherTimer(DispatcherPriority.DataBind);
 
-
-        ConfigJson Configs = null;
-
         void InitConfig()
         {
             try
             {
                 string f = File.ReadAllText("config.json", Encoding.Default);
-                Configs = JsonConvert.DeserializeObject<ConfigJson>(f);
+                DataBinding._DataBinding.Configs = JsonConvert.DeserializeObject<ConfigJson>(f);
             }
             catch (Exception e)
             {
@@ -107,11 +103,11 @@ namespace serialGraph
         private List<int> xList = new List<int>();
         private void InitLines()
         {
-            for (int i = 0; i < Configs.Length; i++)
+            for (int i = 0; i < DataBinding._DataBinding.Configs.Length; i++)
             {
                 xList.Add(i);
             }
-            foreach (var line in Configs.GraphConfigs)
+            foreach (var line in DataBinding._DataBinding.Configs.GraphConfigs)
             {
                 LineGraph lineGraph = new LineGraph();
                 lineGraph.Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString(line.Color));
@@ -123,7 +119,7 @@ namespace serialGraph
                     lineGraph.Visibility = Visibility.Hidden;
                 line.Data = new List<double>();
                 line.tempData = new List<double>();
-                for (int i = 0; i < Configs.Length; i++)
+                for (int i = 0; i < DataBinding._DataBinding.Configs.Length; i++)
                 {
                     line.Data.Add(0);
                 }
@@ -132,43 +128,6 @@ namespace serialGraph
             }
         }
 
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            string str = null;
-            try
-            {
-                //str = serialPort.ReadLine();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-                return;
-            }
-            Dispatcher.Invoke(new Action(() => { 
-                //textBlock.Text = str; 
-            }), DispatcherPriority.DataBind);
-            
-            foreach (var line in Configs.GraphConfigs)
-            {
-                if (str.Contains(line.Name))
-                {
-                    int index = str.IndexOf('=');
-                    int flag = str.IndexOf(';');
-                    if (index > -1 && flag > -1)
-                    {
-                        string value;
-                        value = str.Substring(index + 1,flag - index - 1);
-                        str = str.Substring(flag + 1);
-                        lock (locker)
-                        {
-                            line.tempData.Add(double.Parse(value));
-                        }
-                    }
-                }
-            }
-        }
-
-        private static readonly object locker = new object();
         private bool Pause = false;
         private void Timer_Tick(object sender, EventArgs e)
         {
@@ -176,16 +135,52 @@ namespace serialGraph
             {
                 if(Lines.Children[i] is LineGraph lineGraph)
                 {
-                    lock (locker)
+                    lock (DataBinding.locker)
                     {
-                        Configs.GraphConfigs[i].Data.AddRange(Configs.GraphConfigs[i].tempData);
-                        Configs.GraphConfigs[i].tempData.Clear();
+                        DataBinding._DataBinding.Configs.GraphConfigs[i].Data.AddRange(DataBinding._DataBinding.Configs.GraphConfigs[i].tempData);
+                        DataBinding._DataBinding.Configs.GraphConfigs[i].tempData.Clear();
                     }
-                    Configs.GraphConfigs[i].Data.RemoveRange(0, Configs.GraphConfigs[i].Data.Count - Configs.Length);
-                    if(!Pause)
-                        lineGraph.Plot(xList, Configs.GraphConfigs[i].Data);
+                    DataBinding._DataBinding.Configs.GraphConfigs[i].Data.RemoveRange(0, DataBinding._DataBinding.Configs.GraphConfigs[i].Data.Count - DataBinding._DataBinding.Configs.Length);
+                    if(!DataBinding._DataBinding.GraphPause)
+                        lineGraph.Plot(xList, DataBinding._DataBinding.Configs.GraphConfigs[i].Data);
                 }
             }
+        }
+
+        private void OpenButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!DataBinding._DataBinding.SerialPort.IsOpen)
+            {
+                DataBinding._DataBinding.Configs.PortName = SerialPortComboBox.SelectedItem as string;
+                DataBinding._DataBinding.Configs.BaudRate = (int)BaudRateComboBox.SelectedItem;
+                DataBinding._DataBinding.Configs.DataBits = (int)DataBitsComboBox.SelectedItem;
+                DataBinding._DataBinding.Configs.Parity = ParityComboBoxItem.SelectedItem as string;
+                DataBinding._DataBinding.Configs.StopBits = StopBitsComboBoxItem.SelectedItem as string;
+
+                DataBinding._DataBinding.SerialPort.PortName = DataBinding._DataBinding.Configs.PortName;
+                DataBinding._DataBinding.SerialPort.BaudRate = DataBinding._DataBinding.Configs.BaudRate;
+                DataBinding._DataBinding.SerialPort.DataBits = DataBinding._DataBinding.Configs.DataBits;
+                DataBinding._DataBinding.SerialPort.Parity = (Parity)Enum.Parse(typeof(Parity), DataBinding._DataBinding.Configs.Parity);
+                DataBinding._DataBinding.SerialPort.StopBits = (StopBits)Enum.Parse(typeof(StopBits), DataBinding._DataBinding.Configs.StopBits);
+
+                string f = JsonConvert.SerializeObject(DataBinding._DataBinding.Configs);
+                File.WriteAllText("config.json", f, Encoding.Default);
+            }
+        }
+
+        private void ResumeButton_Click(object sender, RoutedEventArgs e)
+        {
+            D3Chart.PlotOriginX = 0;
+            D3Chart.PlotOriginY = 0;
+            D3Chart.PlotWidth = DataBinding._DataBinding.Configs.Length;
+            D3Chart.PlotHeight = DataBinding._DataBinding.Configs.Height;
+        }
+
+        private void ReceiveTextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (ReceiveTextBox.LineCount > 0)
+                ReceiveTextBox.ScrollToLine(ReceiveTextBox.LineCount-1);
+            if (ReceiveTextBox.LineCount > 1000000000) DataBinding._DataBinding.DataReceive = null;
         }
     }
 

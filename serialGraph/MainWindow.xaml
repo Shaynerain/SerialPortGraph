@@ -77,7 +77,7 @@
                                     </ComboBox>
                                 </Grid>
 
-                                <Button Margin="3" Command="{Binding OpenSerialPort}">
+                                <Button Margin="3" Command="{Binding OpenSerialPort}" Click="OpenButton_Click">
                                     <StackPanel Orientation="Horizontal">
                                         <iconPacks:PackIconModern Kind="{Binding OpenSerialIcon}" VerticalAlignment="Center"/>
                                         <Label Content="{Binding OpenSerialString}"></Label>
@@ -89,7 +89,7 @@
                             <StackPanel Orientation="Vertical">
                                 <Controls:ToggleSwitch OffContent="十六进制显示 OFF" OnContent="十六进制显示 ON" Margin="3"></Controls:ToggleSwitch>
                                 <Controls:ToggleSwitch OffContent="暂停接收显示 OFF" OnContent="暂停接收显示 ON" Margin="3"></Controls:ToggleSwitch>
-                                <Button Margin="3">
+                                <Button Margin="3" Command="{Binding ClearTextCommand}">
                                     <StackPanel Orientation="Horizontal">
                                         <iconPacks:PackIconModern Kind="Delete" VerticalAlignment="Center"/>
                                         <Label>清空显示</Label>
@@ -101,9 +101,9 @@
                             <StackPanel Orientation="Vertical">
                                 <Controls:ToggleSwitch OffContent="十六进制发送 OFF" OnContent="十六进制发送 ON" Margin="3"></Controls:ToggleSwitch>
                                 <Controls:ToggleSwitch OffContent="发送新行 OFF"     OnContent="发送新行 ON"     Margin="3"></Controls:ToggleSwitch>
-                                <ToggleButton Margin="3">
+                                <Button Margin="3" Command="{Binding ClearCountCommand}">
                                     <Label>清空计数</Label>
-                                </ToggleButton>
+                                </Button>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
@@ -113,7 +113,7 @@
                             <RowDefinition Height="100"/>
                             <RowDefinition Height="25"/>
                         </Grid.RowDefinitions>
-                        <TextBox BorderThickness="1" IsReadOnly="True" TextWrapping="Wrap" Margin="3"></TextBox>
+                        <TextBox BorderThickness="1" x:Name="ReceiveTextBox" Text="{Binding DataReceive}" IsReadOnly="True" TextWrapping="Wrap" Margin="3" VerticalScrollBarVisibility="Auto" TextChanged="ReceiveTextChanged"></TextBox>
                         <Grid Grid.Row="1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -163,17 +163,17 @@
                             <!--<d3:PlotAxis AxisOrientation="Left"></d3:PlotAxis>-->
                         </Grid>
                     </d3:Chart>
-                    <StackPanel Orientation="Vertical" HorizontalAlignment="Right" Margin="10">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
                         <ToggleButton x:Name="SettingGraph" Height="40" Width="40" Style="{DynamicResource MahApps.Styles.ToggleButton.Circle}" IsChecked="{Binding IsOpen, ElementName=GraphPopup}" BorderBrush="{x:Null}">
                             <iconPacks:PackIconModern Kind="Settings" Width="30" Height="30"/>
                         </ToggleButton>
-                        <ToggleButton Height="40" Width="40" Style="{DynamicResource MahApps.Styles.ToggleButton.Circle}" BorderBrush="{x:Null}">
+                        <Button Height="40" Width="40" Style="{DynamicResource MahApps.Styles.Button.Circle}" Click="ResumeButton_Click"  BorderBrush="{x:Null}">
                             <iconPacks:PackIconMaterialDesign Kind="ZoomOutMap" Width="30" Height="30" />
-                        </ToggleButton>
-                        <ToggleButton Height="40" Width="40" Style="{DynamicResource MahApps.Styles.ToggleButton.Circle}" BorderBrush="{x:Null}">
+                        </Button>
+                        <ToggleButton Height="40" Width="40" IsChecked="{Binding GraphPause}" Style="{DynamicResource MahApps.Styles.ToggleButton.Circle}" BorderBrush="{x:Null}">
                             <iconPacks:PackIconModern Kind="SignStop" Width="30" Height="30" />
                         </ToggleButton>
-                        <Button Height="40" Width="40" Style="{DynamicResource MahApps.Styles.Button.Circle}" BorderBrush="{x:Null}">
+                        <Button Height="40" Width="40" Style="{DynamicResource MahApps.Styles.Button.Circle}" Command="{Binding DeleteCommand}" BorderBrush="{x:Null}">
                             <iconPacks:PackIconModern Kind="Delete" Width="30" Height="30"/>
                         </Button>
 
