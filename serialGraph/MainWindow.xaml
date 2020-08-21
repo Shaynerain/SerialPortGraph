@@ -87,8 +87,8 @@
                         </GroupBox>
                         <GroupBox Header="接收区设置">
                             <StackPanel Orientation="Vertical">
-                                <Controls:ToggleSwitch OffContent="十六进制显示 OFF" OnContent="十六进制显示 ON" Margin="3"></Controls:ToggleSwitch>
-                                <Controls:ToggleSwitch OffContent="暂停接收显示 OFF" OnContent="暂停接收显示 ON" Margin="3"></Controls:ToggleSwitch>
+                                <Controls:ToggleSwitch OffContent="十六进制显示 OFF" OnContent="十六进制显示 ON" Margin="3" IsOn="{Binding IsReceiveHex}" Command="{Binding ChangedCommand}" />
+                                <Controls:ToggleSwitch OffContent="暂停接收显示 OFF" OnContent="暂停接收显示 ON" Margin="3" IsOn="{Binding IsDataUpdate}" Command="{Binding ChangedCommand}"></Controls:ToggleSwitch>
                                 <Button Margin="3" Command="{Binding ClearTextCommand}">
                                     <StackPanel Orientation="Horizontal">
                                         <iconPacks:PackIconModern Kind="Delete" VerticalAlignment="Center"/>
@@ -99,8 +99,8 @@
                         </GroupBox>
                         <GroupBox Header="发送区设置">
                             <StackPanel Orientation="Vertical">
-                                <Controls:ToggleSwitch OffContent="十六进制发送 OFF" OnContent="十六进制发送 ON" Margin="3"></Controls:ToggleSwitch>
-                                <Controls:ToggleSwitch OffContent="发送新行 OFF"     OnContent="发送新行 ON"     Margin="3"></Controls:ToggleSwitch>
+                                <Controls:ToggleSwitch OffContent="十六进制发送 OFF" OnContent="十六进制发送 ON" Command="{Binding ChangeEncodingCommand}" IsOn="{Binding IsSendHex}" Margin="3"></Controls:ToggleSwitch>
+                                <Controls:ToggleSwitch OffContent="发送新行 OFF"     OnContent="发送新行 ON"    IsOn="{Binding IsSendNewLine}" Margin="3"  Command="{Binding ChangedCommand}"></Controls:ToggleSwitch>
                                 <Button Margin="3" Command="{Binding ClearCountCommand}">
                                     <Label>清空计数</Label>
                                 </Button>
@@ -119,8 +119,8 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="100"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox BorderThickness="1" AutoWordSelection="True" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" Margin="3"></TextBox>
-                            <Button Grid.Column="1" Margin="3">
+                            <TextBox BorderThickness="1" AutoWordSelection="True" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" Margin="3" Text="{Binding SendDataText}"></TextBox>
+                            <Button Grid.Column="1" Margin="3" Command="{Binding SendDataComand}">
                                 <iconPacks:PackIconFontAwesome Width="40" Height="40" Kind="PaperPlaneRegular" />
                             </Button>
                         </Grid>
@@ -164,9 +164,9 @@
                         </Grid>
                     </d3:Chart>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top">
-                        <ToggleButton x:Name="SettingGraph" Height="40" Width="40" Style="{DynamicResource MahApps.Styles.ToggleButton.Circle}" IsChecked="{Binding IsOpen, ElementName=GraphPopup}" BorderBrush="{x:Null}">
+                        <Button x:Name="SettingGraph" Height="40" Width="40" Style="{DynamicResource MahApps.Styles.Button.Circle}" Click="SettingGraph_Click"  BorderBrush="{x:Null}">
                             <iconPacks:PackIconModern Kind="Settings" Width="30" Height="30"/>
-                        </ToggleButton>
+                        </Button>
                         <Button Height="40" Width="40" Style="{DynamicResource MahApps.Styles.Button.Circle}" Click="ResumeButton_Click"  BorderBrush="{x:Null}">
                             <iconPacks:PackIconMaterialDesign Kind="ZoomOutMap" Width="30" Height="30" />
                         </Button>
@@ -178,11 +178,6 @@
                         </Button>
 
                     </StackPanel>
-                    <Popup x:Name="GraphPopup" PlacementTarget="{Binding ElementName=SettingGraph}" Placement="Left" StaysOpen="False"  PopupAnimation="Fade">
-                        <StackPanel Background="WhiteSmoke">
-                            <Label>hello</Label>
-                        </StackPanel>
-                    </Popup>
                 </Grid>
             </Controls:MetroTabItem>
         </Controls:MetroAnimatedSingleRowTabControl>

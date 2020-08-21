@@ -5,10 +5,17 @@
 	"Parity": "None",
 	"StopBits": "One",
 
+	"IsReceiveHex":false,
+	"IsDataUpdate":false,
+	"IsSendHex":false,
+	"IsSendNewLine":false,
+
 	"BaudRates": [ 9600, 115200, 500000, 1000000, 1500000, 2000000 ],
 
 	"Length": 1000,
 	"Height": 1000,
+	"OX": 0,
+	"OY": 0,
 
 	"GraphConfigs": [
 		{
@@ -16,16 +23,14 @@
 			"Color": "#FF3333",
 			"Thickness": 1,
 			"Factory": 1,
-			"OffSet": 0,
-			"Visibility": true
+			"OffSet": 0
 		},
 		{
 			"Name": "Line2",
 			"Color": "#FFff33",
 			"Thickness": 1,
 			"Factory": 1,
-			"OffSet": 0,
-			"Visibility": true
+			"OffSet": 0
 		}
 	]
 }

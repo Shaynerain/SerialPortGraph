@@ -1,11 +1,13 @@
 ﻿using InteractiveDataDisplay.WPF;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,12 +18,23 @@ namespace serialGraph
     {
         public static DataBinding _DataBinding = new DataBinding();
 
-        #region 串口设置
-
         public SerialPort SerialPort = new SerialPort();
 
+        public Action<object> ErrorMessage;
 
         public ConfigJson Configs = null;
+        public bool isInit = false;
+        public void InitValue()
+        {
+            IsReceiveHex = Configs.IsReceiveHex;
+            IsDataUpdate = Configs.IsDataUpdate;
+            IsSendHex = Configs.IsSendHex;
+            IsSendNewLine = Configs.IsSendNewLine;
+            isInit = true;
+        }
+
+        #region 串口设置
+
 
 
         private PackIconModernKind _openSerialIcon = PackIconModernKind.Connect;
@@ -56,7 +69,6 @@ namespace serialGraph
                 return new RelayCommand(OnOpenSerialPort);
             }
         }
-        Action<object> ErrorMessage;
         private void OnOpenSerialPort(object parameter)
         {
             //已经打开，现在关闭
@@ -92,53 +104,57 @@ namespace serialGraph
 
         #endregion
 
-        private string _dataReceived;
+
+        #region 串口接收区
+
+        private string _dataReceived = "";
 
         public string DataReceive
         {
             get { return _dataReceived; }
-            set { _dataReceived = value;
+            set
+            {
+                _dataReceived = value;
                 OnPropertyChanged("DataReceive");
             }
         }
 
+        private bool _isReceiveHex = false;
 
-        public static readonly object locker = new object();
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        public bool IsReceiveHex
         {
-            string str = null;
-            try
-            {
-                str = SerialPort.ReadLine();
+            get { return _isReceiveHex; }
+            set { _isReceiveHex = value;
+                OnPropertyChanged("IsReceiveHex");
             }
-            catch (Exception ex)
-            {
-                ErrorMessage?.Invoke(ex);
-                return;
-            }
-            DataReceive += str;
-            ReCount += str.Length;
+        }
+        private bool _isDataUpdate = false;
 
-            foreach (var line in Configs.GraphConfigs)
-            {
-                if (str.Contains(line.Name))
-                {
-                    int index = str.IndexOf('=');
-                    int flag = str.IndexOf(';');
-                    if (index > -1 && flag > -1)
-                    {
-                        string value;
-                        value = str.Substring(index + 1, flag - index - 1);
-                        str = str.Substring(flag + 1);
-                        lock (locker)
-                        {
-                            line.tempData.Add(double.Parse(value));
-                        }
-                    }
-                }
+        public bool IsDataUpdate
+        {
+            get { return _isDataUpdate; }
+            set { _isDataUpdate = value;
+                OnPropertyChanged("IsDataUpdate");
             }
         }
 
+
+        public RelayCommand ClearTextCommand
+        {
+            get
+            {
+                return new RelayCommand(OnClearText);
+            }
+        }
+        private void OnClearText(object parameter)
+        {
+            DataReceive = null;
+            ReCount = 0;
+        }
+        #endregion
+
+
+        #region 串口发送区
 
         private int _sendCount = 0;
 
@@ -151,6 +167,7 @@ namespace serialGraph
                 OnPropertyChanged("SendCount");
             }
         }
+
         private int _reCount = 0;
 
         public int ReCount
@@ -163,16 +180,273 @@ namespace serialGraph
             }
         }
 
-        private bool _isPause = false;
+        private bool _isSendHex = false;
 
+        public bool IsSendHex
+        {
+            get { return _isSendHex; }
+            set { _isSendHex = value;
+                OnPropertyChanged("IsSendHex");
+            }
+        }
+
+        private bool isSendNewLine;
+
+        public bool IsSendNewLine
+        {
+            get { return isSendNewLine; }
+            set { isSendNewLine = value;
+                OnPropertyChanged("IsSendNewLine");
+            }
+        }
+
+        /// <summary>
+        /// 发送改变编码
+        /// </summary>
+        public RelayCommand ChangeEncodingCommand
+        {
+            get
+            {
+                return new RelayCommand(OnChangeEncoding);
+            }
+        }
+        private void OnChangeEncoding(object parameter)
+        {
+            if (SendDataText == null) return;
+            //char -> hex
+            if (IsSendHex)
+            {
+                char[] cd = SendDataText.ToArray();
+                string sd = null;
+                try
+                {
+                    foreach (var item in cd)
+                    {
+                        sd += Convert.ToString(item, 16).ToUpper() + ' ';
+                    }
+                    SendDataText = sd;
+                }
+                catch (Exception e)
+                {
+                    ErrorMessage?.Invoke(e);
+                }
+            }
+            //hex -> char
+            else
+            {
+                string[] sdata = SendDataText.Split(' ');
+                string data = null;
+                try
+                {
+                    foreach (var item in sdata)
+                    {
+                        if (item != "")
+                            data += Convert.ToChar(Convert.ToByte(item, 16));
+                    }
+                    SendDataText = data;
+                }
+                catch (Exception e)
+                {
+                    ErrorMessage?.Invoke(e);
+                }
+            }
+            OnChanged(parameter);
+        }
+
+        /// <summary>
+        /// 清空计数
+        /// </summary>
+        public RelayCommand ClearCountCommand
+        {
+            get
+            {
+                return new RelayCommand(OnClearCount);
+            }
+        }
+        private void OnClearCount(object parameter)
+        {
+            SendCount = 0;
+            ReCount = 0;
+        }
+
+        private string _sendDataText=null;
+        /// <summary>
+        /// 发送区域显示
+        /// </summary>
+        public string SendDataText
+        {
+            get { return _sendDataText; }
+            set { _sendDataText = value;
+                OnPropertyChanged("SendDataText");
+            }
+        }
+
+        /// <summary>
+        /// 发送命令
+        /// </summary>
+        public RelayCommand SendDataComand
+        {
+            get
+            {
+                return new RelayCommand(OnSendData);
+            }
+        }
+        private void OnSendData(object parameter)
+        {
+            string data = SendDataText;
+            if (IsSendHex)
+            {
+                string[] sdata = data.Split(' ');
+                List<byte> vs = new List<byte>();
+                foreach (var item in sdata)
+                {
+                    if(item!="")
+                        vs.Add(Convert.ToByte(item,16));
+                }
+
+                if (isSendNewLine)
+                {
+                    vs.Add((byte)'\r');
+                    vs.Add((byte)'\n');
+                }
+                if (SerialPort.IsOpen)
+                {
+                    try
+                    {
+                        SerialPort.Write(vs.ToArray(),0,vs.Count);
+                    }
+                    catch (Exception e)
+                    {
+                        ErrorMessage?.Invoke(e);
+                    }
+                }
+            }
+            else
+            {
+                if (isSendNewLine)
+                    data += "\r\n";
+                if (SerialPort.IsOpen)
+                {
+                    try
+                    {
+                        SerialPort.Write(data);
+                    }
+                    catch (Exception e)
+                    {
+                        ErrorMessage?.Invoke(e);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region 串口数据处理
+
+        public static readonly object locker = new object();
+
+        //判断是否波形格式，不能大于512
+        string str_temp = null;
+        /// <summary>
+        /// 数据接收中断
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            int count = SerialPort.BytesToRead;
+            string str = null;
+            if (IsReceiveHex)
+            {
+                byte[] data = new byte[count];
+                try
+                {
+                    SerialPort.Read(data, 0, count);
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage?.Invoke(ex);
+                    return;
+                }
+
+                foreach (var item in data)
+                {
+                    str += Convert.ToString(item, 16).ToUpper() + ' ';
+                    str_temp += ((char)item).ToString();
+                }
+            }
+            else
+            {
+                char[] data = new char[count];
+                try
+                {
+                    SerialPort.Read(data, 0, count);
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage?.Invoke(ex);
+                    return;
+                }
+
+                foreach (var item in data)
+                {
+                    str += item.ToString();
+                }
+
+                str_temp += str;
+            }
+            if(!IsDataUpdate)
+                DataReceive += str;
+            ReCount += str.Length;
+            if (str_temp.Contains("\r\n"))
+            {
+                foreach (var line in Configs.GraphConfigs)
+                {
+                    if (str_temp.Contains(line.Name))
+                    {
+                        int index = str_temp.IndexOf('=');
+                        int flag = str_temp.IndexOf(';');
+                        if (index > -1 && flag > -1)
+                        {
+                            string value;
+                            value = str_temp.Substring(index + 1, flag - index - 1);
+                            str_temp = str_temp.Substring(flag + 1);
+                            lock (locker)
+                            {
+                                line.tempData.Add(double.Parse(value));
+                            }
+                        }
+                    }
+                }
+                int rn = str_temp.IndexOf("\r\n");
+                if(rn>-1)
+                    str_temp = str_temp.Substring(0, rn + 2);
+
+            }
+            if (str_temp.Length > 512) str_temp = null;
+        }
+        #endregion
+
+
+        #region 波形显示
+
+        private bool _isPause = false;
+        /// <summary>
+        /// 波形暂停
+        /// </summary>
         public bool GraphPause
         {
             get { return _isPause; }
-            set { _isPause = value;
+            set
+            {
+                _isPause = value;
                 OnPropertyChanged("GraphPause");
             }
         }
 
+        /// <summary>
+        /// 波形清空指令
+        /// </summary>
         public RelayCommand DeleteCommand
         {
             get
@@ -195,31 +469,27 @@ namespace serialGraph
                 }
             }
         }
+        #endregion
 
-        public RelayCommand ClearTextCommand
-        {
-            get
-            {
-                return new RelayCommand(OnClearText);
-            }
-        }
-        private void OnClearText(object parameter)
-        {
-            DataReceive = null;
-        }
 
-        public RelayCommand ClearCountCommand
+
+        public RelayCommand ChangedCommand
         {
-            get
-            {
-                return new RelayCommand(OnClearCount);
-            }
+            get { return new RelayCommand(OnChanged,(p) => { return isInit; }); }
         }
-        private void OnClearCount(object parameter)
+        private void OnChanged(object parameter)
         {
-            SendCount = 0;
-            ReCount = 0;
+            WriteConfig();
         }
 
+        public void WriteConfig()
+        {
+            Configs.IsReceiveHex = IsReceiveHex;
+            Configs.IsDataUpdate = IsDataUpdate;
+            Configs.IsSendHex = IsSendHex;
+            Configs.IsSendNewLine = IsSendNewLine;
+            string f = JsonConvert.SerializeObject(Configs);
+            File.WriteAllText("config.json", f, Encoding.Default);
+        }
     }
 }

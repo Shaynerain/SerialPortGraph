@@ -10,13 +10,10 @@ namespace serialGraph
     {
         //线的名字
         public string Name { get; set; }
-        //public int Address { get; set; }
-
         public string Color { get; set; }
-        public int Thickness { get; set; }
-        public int Factory { get; set; }
-        public int OffSet { get; set; }
-        public bool Visibility { get; set; }
+        public double Thickness { get; set; }
+        public double Factory { get; set; }
+        public double OffSet { get; set; }
         public List<double> Data { get; set; }
         public List<double> tempData { get; set; }
     }

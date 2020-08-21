@@ -34,17 +34,21 @@ namespace serialGraph
             InitializeComponent();
 
             this.DataContext = DataBinding._DataBinding;
-
+            DataBinding._DataBinding.ErrorMessage = ErrorMessage;
             InitConfig();
             InitUI();
             //GreatConfigJsonFile();
-
             //设置时间，秒数，精确到最接近的毫秒
             Timer.Interval = TimeSpan.FromSeconds(0.01);
             //设置触发时间  
             Timer.Tick += Timer_Tick;
             Timer.Start();
 
+        }
+
+        private void ErrorMessage(object e)
+        {
+            MessageBox.Show(e.ToString());
         }
 
         private void InitUI()
@@ -82,6 +86,7 @@ namespace serialGraph
                 ParityComboBoxItem.SelectedItem = DataBinding._DataBinding.Configs.Parity;
                 StopBitsComboBoxItem.SelectedItem = DataBinding._DataBinding.Configs.StopBits;
 
+                DataBinding._DataBinding.InitValue();
             }
         }
 
@@ -93,6 +98,7 @@ namespace serialGraph
             {
                 string f = File.ReadAllText("config.json", Encoding.Default);
                 DataBinding._DataBinding.Configs = JsonConvert.DeserializeObject<ConfigJson>(f);
+                f = null;
             }
             catch (Exception e)
             {
@@ -113,10 +119,6 @@ namespace serialGraph
                 lineGraph.Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString(line.Color));
                 lineGraph.Description = line.Name;
                 lineGraph.StrokeThickness = line.Thickness;
-                if (line.Visibility)
-                    lineGraph.Visibility = Visibility.Visible;
-                else
-                    lineGraph.Visibility = Visibility.Hidden;
                 line.Data = new List<double>();
                 line.tempData = new List<double>();
                 for (int i = 0; i < DataBinding._DataBinding.Configs.Length; i++)
@@ -163,15 +165,14 @@ namespace serialGraph
                 DataBinding._DataBinding.SerialPort.Parity = (Parity)Enum.Parse(typeof(Parity), DataBinding._DataBinding.Configs.Parity);
                 DataBinding._DataBinding.SerialPort.StopBits = (StopBits)Enum.Parse(typeof(StopBits), DataBinding._DataBinding.Configs.StopBits);
 
-                string f = JsonConvert.SerializeObject(DataBinding._DataBinding.Configs);
-                File.WriteAllText("config.json", f, Encoding.Default);
+                DataBinding._DataBinding.WriteConfig();
             }
         }
 
         private void ResumeButton_Click(object sender, RoutedEventArgs e)
         {
-            D3Chart.PlotOriginX = 0;
-            D3Chart.PlotOriginY = 0;
+            D3Chart.PlotOriginX = DataBinding._DataBinding.Configs.OX;
+            D3Chart.PlotOriginY = DataBinding._DataBinding.Configs.OY;
             D3Chart.PlotWidth = DataBinding._DataBinding.Configs.Length;
             D3Chart.PlotHeight = DataBinding._DataBinding.Configs.Height;
         }
@@ -181,6 +182,11 @@ namespace serialGraph
             if (ReceiveTextBox.LineCount > 0)
                 ReceiveTextBox.ScrollToLine(ReceiveTextBox.LineCount-1);
             if (ReceiveTextBox.LineCount > 1000000000) DataBinding._DataBinding.DataReceive = null;
+        }
+
+        private void SettingGraph_Click(object sender, RoutedEventArgs e)
+        {
+            new GraphComfigs().ShowDialog();
         }
     }
 
