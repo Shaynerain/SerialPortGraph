@@ -20,10 +20,24 @@ namespace serialGraph
     /// </summary>
     public partial class GraphComfigs : MetroWindow
     {
-        public GraphComfigs()
+        ConfigJson ConfigJson;
+        public GraphComfigs(ConfigJson configJson)
         {
             InitializeComponent();
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            ConfigJson = configJson;
+            InitUI();
+        }
+
+        private void InitUI()
+        {
+            if(ConfigJson != null)
+            {
+                XWidthTextBox.Text = ConfigJson.Length.ToString();
+                YWidthTextBox.Text = ConfigJson.Height.ToString();
+                OYTextBox.Text = ConfigJson.OY.ToString();
+                OXTextBox.Text = ConfigJson.OX.ToString();
+            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

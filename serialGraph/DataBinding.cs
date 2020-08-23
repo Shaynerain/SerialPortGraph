@@ -352,7 +352,7 @@ namespace serialGraph
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        public void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             int count = SerialPort.BytesToRead;
             string str = null;

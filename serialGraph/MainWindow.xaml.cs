@@ -186,7 +186,19 @@ namespace serialGraph
 
         private void SettingGraph_Click(object sender, RoutedEventArgs e)
         {
-            new GraphComfigs().ShowDialog();
+            if(DataBinding._DataBinding.Configs !=null)
+            {
+                GraphComfigs graphComfigs = new GraphComfigs();
+                if (graphComfigs.ShowDialog() == true)
+                {
+                    //确定后返回,重新设置图像
+                    Timer.Stop();
+                    DataBinding._DataBinding.SerialPort.DataReceived -= DataBinding._DataBinding.SerialPort_DataReceived;
+
+
+                    //SerialPort.DataReceived += SerialPort_DataReceived;
+                }
+            }
         }
     }
 

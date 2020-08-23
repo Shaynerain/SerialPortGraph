@@ -15,28 +15,28 @@
                             <iconPacks:PackIconModern Kind="AxisXLetter" VerticalAlignment="Center" />
                             <Label Content="X轴宽度(长度缓存)：" VerticalAlignment="Center"></Label>
                         </StackPanel>
-                        <TextBox VerticalAlignment="Center" HorizontalAlignment="Right" Width="100"></TextBox>
+                        <TextBox x:Name="XWidthTextBox" VerticalAlignment="Center" HorizontalAlignment="Right" Width="100"></TextBox>
                     </Grid>
                     <Grid Margin="3">
                         <StackPanel Orientation="Horizontal">
                             <iconPacks:PackIconModern Kind="AxisYLetter" VerticalAlignment="Center" />
                             <Label Content="Y轴宽度：" VerticalAlignment="Center"></Label>
                         </StackPanel>
-                        <TextBox VerticalAlignment="Center" HorizontalAlignment="Right" Width="100"></TextBox>
+                        <TextBox x:Name="YWidthTextBox" VerticalAlignment="Center" HorizontalAlignment="Right" Width="100"></TextBox>
                     </Grid>
                     <Grid Margin="3">
                         <StackPanel Orientation="Horizontal">
                             <iconPacks:PackIconModern Kind="AxisX" VerticalAlignment="Center" />
                             <Label Content="原点坐标X：" VerticalAlignment="Center"></Label>
                         </StackPanel>
-                        <TextBox VerticalAlignment="Center" HorizontalAlignment="Right" Width="100"></TextBox>
+                        <TextBox x:Name="OXTextBox" VerticalAlignment="Center" HorizontalAlignment="Right" Width="100"></TextBox>
                     </Grid>
                     <Grid Margin="3">
                         <StackPanel Orientation="Horizontal">
                             <iconPacks:PackIconModern Kind="AxisZ" VerticalAlignment="Center" />
                             <Label Content="原点坐标Y：" VerticalAlignment="Center"></Label>
                         </StackPanel>
-                        <TextBox VerticalAlignment="Center" HorizontalAlignment="Right" Width="100"></TextBox>
+                        <TextBox  x:Name="OYTextBox" VerticalAlignment="Center" HorizontalAlignment="Right" Width="100"></TextBox>
                     </Grid>
                 </StackPanel>
             </GroupBox>
@@ -68,7 +68,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBox Margin="1" Text="Line1" VerticalAlignment="Center"></TextBox>
                         <TextBox Margin="1" Grid.Column="1" Text="0" VerticalAlignment="Center" />
-                        <TextBox Margin="1" Grid.Column="2" Text="0" VerticalAlignment="Center"/>
+                        <TextBox Margin="1" Grid.Column="2" Text="1" VerticalAlignment="Center"/>
                         <TextBox Margin="1" Grid.Column="3"  Text="1" VerticalAlignment="Center"/>
                         <Button x:Name="SelecteButton" Margin="1" Grid.Column="4" Background="Black" BorderBrush="{x:Null}" Foreground="{x:Null}" Click="Button_Click">
                         </Button>
@@ -76,90 +76,6 @@
                     </Grid>
 
                     <ListBox x:Name="GraphListBox" Height="130">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="2*"/>
-                            </Grid.ColumnDefinitions>
-                            <Label Margin="1" Content="Line1" VerticalAlignment="Center" HorizontalAlignment="Center"></Label>
-                            <Label Margin="1" Grid.Column="1" Content="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Label Margin="1" Grid.Column="2" Content="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Label Margin="1" Grid.Column="3"  Content="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Grid Margin="5" Grid.Column="4" Background="Black"></Grid>
-                        </Grid>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="2*"/>
-                            </Grid.ColumnDefinitions>
-                            <Label Margin="1" Content="Line1" VerticalAlignment="Center" HorizontalAlignment="Center"></Label>
-                            <Label Margin="1" Grid.Column="1" Content="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Label Margin="1" Grid.Column="2" Content="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Label Margin="1" Grid.Column="3"  Content="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Grid Margin="5" Grid.Column="4" Background="Black"></Grid>
-                        </Grid>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="2*"/>
-                            </Grid.ColumnDefinitions>
-                            <Label Margin="1" Content="Line1" VerticalAlignment="Center" HorizontalAlignment="Center"></Label>
-                            <Label Margin="1" Grid.Column="1" Content="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Label Margin="1" Grid.Column="2" Content="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Label Margin="1" Grid.Column="3"  Content="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Grid Margin="5" Grid.Column="4" Background="Black"></Grid>
-                        </Grid>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="2*"/>
-                            </Grid.ColumnDefinitions>
-                            <Label Margin="1" Content="Line1" VerticalAlignment="Center" HorizontalAlignment="Center"></Label>
-                            <Label Margin="1" Grid.Column="1" Content="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Label Margin="1" Grid.Column="2" Content="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Label Margin="1" Grid.Column="3"  Content="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Grid Margin="5" Grid.Column="4" Background="Black"></Grid>
-                        </Grid>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="2*"/>
-                            </Grid.ColumnDefinitions>
-                            <Label Margin="1" Content="Line1" VerticalAlignment="Center" HorizontalAlignment="Center"></Label>
-                            <Label Margin="1" Grid.Column="1" Content="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Label Margin="1" Grid.Column="2" Content="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Label Margin="1" Grid.Column="3"  Content="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Grid Margin="5" Grid.Column="4" Background="Black"></Grid>
-                        </Grid>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="2*"/>
-                            </Grid.ColumnDefinitions>
-                            <Label Margin="1" Content="Line1" VerticalAlignment="Center" HorizontalAlignment="Center"></Label>
-                            <Label Margin="1" Grid.Column="1" Content="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Label Margin="1" Grid.Column="2" Content="0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Label Margin="1" Grid.Column="3"  Content="1" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Grid Margin="5" Grid.Column="4" Background="Black"></Grid>
-                        </Grid>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
