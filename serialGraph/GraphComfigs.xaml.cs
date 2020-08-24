@@ -21,33 +21,125 @@ namespace serialGraph
     public partial class GraphComfigs : MetroWindow
     {
         ConfigJson ConfigJson;
+        ConfigJson NewConfigs;
         public GraphComfigs(ConfigJson configJson)
         {
             InitializeComponent();
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             ConfigJson = configJson;
-            InitUI();
+            if (ConfigJson != null)
+            {
+                InitConfig();
+                InitUI();
+            }
+            else DialogResult = false;
+        }
+        
+        private void InitConfig()
+        {
+            NewConfigs = new ConfigJson();
+            NewConfigs.GraphConfigs = new List<GraphConfig>();
+
+            NewConfigs.Height = ConfigJson.Height;
+            NewConfigs.Length = ConfigJson.Length;
+            NewConfigs.OX = ConfigJson.OX;
+            NewConfigs.OY = ConfigJson.OY;
+
+            foreach (var item in ConfigJson.GraphConfigs)
+            {
+                NewConfigs.GraphConfigs.Add(item);
+            }
+            ConfigJson.GraphConfigs.Clear();
         }
 
         private void InitUI()
         {
-            if(ConfigJson != null)
+            //坐标
+            XWidthTextBox.Text = ConfigJson.Length.ToString();
+            YWidthTextBox.Text = ConfigJson.Height.ToString();
+            OYTextBox.Text = ConfigJson.OY.ToString();
+            OXTextBox.Text = ConfigJson.OX.ToString();
+
+            //波形
+            GraphListBox.Items.Clear();
+            foreach (var item in ConfigJson.GraphConfigs)
             {
-                XWidthTextBox.Text = ConfigJson.Length.ToString();
-                YWidthTextBox.Text = ConfigJson.Height.ToString();
-                OYTextBox.Text = ConfigJson.OY.ToString();
-                OXTextBox.Text = ConfigJson.OX.ToString();
+                AddGraph(item);
+            }
+            
+        }
+
+        private void AddGraph(GraphConfig graphConfig)
+        {
+            if (graphConfig != null)
+            {
+                Grid grid = new Grid();
+                int[] width = { 1, 1, 1, 1, 2 };
+                foreach (var item in width)
+                {
+                    grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(item, GridUnitType.Star) });
+                }
+                grid.Children.Add(new Label() { Margin = new Thickness(1), Content = graphConfig.Name, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center });
+                grid.Children.Add(new Label() { Margin = new Thickness(1), Content = graphConfig.OffSet, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center });
+                grid.Children.Add(new Label() { Margin = new Thickness(1), Content = graphConfig.Factory, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center });
+                grid.Children.Add(new Label() { Margin = new Thickness(1), Content = graphConfig.Thickness, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center });
+                grid.Children.Add(new Grid() { Margin = new Thickness(5), Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(graphConfig.Color)) });
+                for (int i = 0; i < grid.Children.Count; i++)
+                {
+                    Grid.SetColumn(grid.Children[i], i);
+                }
+                GraphListBox.Items.Add(grid);
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void ColorButton_Click(object sender, RoutedEventArgs e)
         {
-            new SelecteColor(SelecteButton).ShowDialog();
+            new SelecteColor(ColorButton).ShowDialog();
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void AddLine()
+        {
+            foreach (var item in NewConfigs.GraphConfigs)
+            {
+                if(item.Name == NameTextBox.Text)
+                {
+                    MessageBox.Show("该名称已经存在");
+                    return;
+                }    
+            }
+            GraphConfig graphConfig = new GraphConfig();
+            double offSet = 0, factory=0, thickness=0;
+            if(double.TryParse(OffSetTextBox.Text, out offSet))
+                graphConfig.OffSet = offSet;
+            else 
+                graphConfig.OffSet = 0;
+            if (double.TryParse(FactoryTextBox.Text, out factory))
+                graphConfig.OffSet = offSet;
+            else
+                graphConfig.OffSet = 0;
+            if (double.TryParse(ThicknessTextBox.Text, out thickness))
+                graphConfig.OffSet = offSet;
+            else
+                graphConfig.OffSet = 0;
+            graphConfig.Color = ColorButton.Background.ToString();
+
+
+        }
+
+        private void AddButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void ApplyButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
         }
+
     }
 }

@@ -188,7 +188,7 @@ namespace serialGraph
         {
             if(DataBinding._DataBinding.Configs !=null)
             {
-                GraphComfigs graphComfigs = new GraphComfigs();
+                GraphComfigs graphComfigs = new GraphComfigs(DataBinding._DataBinding.Configs);
                 if (graphComfigs.ShowDialog() == true)
                 {
                     //确定后返回,重新设置图像

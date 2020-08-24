@@ -57,7 +57,7 @@
                         <Label Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center">粗细</Label>
                         <Label Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center">颜色</Label>
                     </Grid>
-                    <Grid>
+                    <Grid x:Name="InfoGrid">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
@@ -66,13 +66,13 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox Margin="1" Text="Line1" VerticalAlignment="Center"></TextBox>
-                        <TextBox Margin="1" Grid.Column="1" Text="0" VerticalAlignment="Center" />
-                        <TextBox Margin="1" Grid.Column="2" Text="1" VerticalAlignment="Center"/>
-                        <TextBox Margin="1" Grid.Column="3"  Text="1" VerticalAlignment="Center"/>
-                        <Button x:Name="SelecteButton" Margin="1" Grid.Column="4" Background="Black" BorderBrush="{x:Null}" Foreground="{x:Null}" Click="Button_Click">
+                        <TextBox Name="NameTextBox" Margin="1" Text="Line1" VerticalAlignment="Center"></TextBox>
+                        <TextBox Name="OffSetTextBox" Margin="1" Grid.Column="1" Text="0" VerticalAlignment="Center" />
+                        <TextBox Name="FactoryTextBox" Margin="1" Grid.Column="2" Text="1" VerticalAlignment="Center"/>
+                        <TextBox Name="ThicknessTextBox" Margin="1" Grid.Column="3"  Text="1" VerticalAlignment="Center"/>
+                        <Button Name="ColorButton" Margin="1" Grid.Column="4" Background="Black" BorderBrush="{x:Null}" Foreground="{x:Null}" Click="ColorButton_Click">
                         </Button>
-                        <Button Margin="1" Grid.Column="5">添加</Button>
+                        <Button Click="AddButton_Click" Margin="1" Grid.Column="5">添加</Button>
                     </Grid>
 
                     <ListBox x:Name="GraphListBox" Height="130">
@@ -91,13 +91,13 @@
                             <Grid Margin="5" Grid.Column="4" Background="Black"></Grid>
                         </Grid>
                     </ListBox>
-                    <Button Margin="2">
+                    <Button Margin="2" Click="DeleteButton_Click">
                         <StackPanel Orientation="Horizontal">
                             <iconPacks:PackIconFontAwesome Kind="TrashAltSolid" Width="20" Height="20" VerticalAlignment="Center" />
                             <Label Content="删除" VerticalAlignment="Center"></Label>
                         </StackPanel>
                     </Button>
-                    <Button Margin="2" Click="Button_Click_1">
+                    <Button Margin="2" Click="ApplyButton_Click">
                         <StackPanel Orientation="Horizontal">
                             <iconPacks:PackIconOcticons Kind="Check" Width="20" Height="20" VerticalAlignment="Center" />
                             <Label Content="确定" VerticalAlignment="Center"></Label>
