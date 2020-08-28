@@ -41,10 +41,10 @@
                                         <Label Content="波特率：" VerticalAlignment="Center"></Label>
                                     </StackPanel>
                                     <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                        <ToggleButton x:Name="UserBaudRateButton" BorderBrush="{x:Null}">
+                                        <ToggleButton x:Name="UserBaudRateButton" BorderBrush="{x:Null}" Click="UserBaudRate_Click">
                                             <iconPacks:PackIconJamIcons Kind="Write" />
                                         </ToggleButton>
-                                        <TextBox x:Name="UserBaudRateTextBox" Width="100" Controls:TextBoxHelper.ClearTextButton="True" Visibility="Collapsed">
+                                        <TextBox x:Name="UserBaudRateTextBox" Width="100" Controls:TextBoxHelper.ClearTextButton="True" VerticalAlignment="Center" VerticalContentAlignment="Center" Visibility="Collapsed">
                                             
                                         </TextBox>
                                         <ComboBox x:Name="BaudRateComboBox" VerticalAlignment="Center"  Width="100" SelectedIndex="3">

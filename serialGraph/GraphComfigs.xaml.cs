@@ -21,7 +21,7 @@ namespace serialGraph
     public partial class GraphComfigs : MetroWindow
     {
         ConfigJson ConfigJson;
-        ConfigJson NewConfigs;
+        public ConfigJson NewConfigs;
         public GraphComfigs(ConfigJson configJson)
         {
             InitializeComponent();
@@ -49,7 +49,7 @@ namespace serialGraph
             {
                 NewConfigs.GraphConfigs.Add(item);
             }
-            ConfigJson.GraphConfigs.Clear();
+            //ConfigJson.GraphConfigs.Clear();
         }
 
         private void InitUI()
@@ -105,39 +105,81 @@ namespace serialGraph
                 {
                     MessageBox.Show("该名称已经存在");
                     return;
-                }    
+                }
             }
             GraphConfig graphConfig = new GraphConfig();
             double offSet = 0, factory=0, thickness=0;
-            if(double.TryParse(OffSetTextBox.Text, out offSet))
+            graphConfig.Name = NameTextBox.Text;
+            if (double.TryParse(OffSetTextBox.Text, out offSet))
                 graphConfig.OffSet = offSet;
             else 
                 graphConfig.OffSet = 0;
             if (double.TryParse(FactoryTextBox.Text, out factory))
-                graphConfig.OffSet = offSet;
+                graphConfig.Factory = factory;
             else
-                graphConfig.OffSet = 0;
+                graphConfig.Factory = 1;
             if (double.TryParse(ThicknessTextBox.Text, out thickness))
-                graphConfig.OffSet = offSet;
+                graphConfig.Thickness = thickness;
             else
-                graphConfig.OffSet = 0;
+                graphConfig.Thickness = 1;
             graphConfig.Color = ColorButton.Background.ToString();
 
+            NewConfigs.GraphConfigs.Add(graphConfig);
+            AddGraph(graphConfig);
+        }
+        private void DeleteLine()
+        {
+            var item = GraphListBox.SelectedItem;
+            if(item is Grid grid)
+            {
+                Label label = grid.Children[0] as Label;
+                foreach (var line in NewConfigs.GraphConfigs)
+                {
+                    if(line.Name == label.Content as string)
+                    {
+                        NewConfigs.GraphConfigs.Remove(line);
+                        break;
+                    }
+                }
+                GraphListBox.Items.Remove(item);
+            }
 
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-
+            AddLine();
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            
+            DeleteLine();
         }
 
         private void ApplyButton_Click(object sender, RoutedEventArgs e)
         {
+            int Length, Height, OX, OY;
+
+            if (int.TryParse(XWidthTextBox.Text, out Length))
+                NewConfigs.Length = Length;
+            else
+                NewConfigs.Length = 1000;
+
+            if (int.TryParse(YWidthTextBox.Text, out Height))
+                NewConfigs.Height = Height;
+            else
+                NewConfigs.Height = 1000;
+
+            if (int.TryParse(OXTextBox.Text, out OX))
+                NewConfigs.OX = OX;
+            else
+                NewConfigs.OX = 1000;
+
+            if (int.TryParse(OYTextBox.Text, out OY))
+                NewConfigs.OY = OY;
+            else
+                NewConfigs.OY = 1000;
+
             DialogResult = true;
         }
 

@@ -9,6 +9,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,7 +40,7 @@ namespace serialGraph
             InitUI();
             //GreatConfigJsonFile();
             //设置时间，秒数，精确到最接近的毫秒
-            Timer.Interval = TimeSpan.FromSeconds(0.01);
+            Timer.Interval = TimeSpan.FromSeconds(0.02);
             //设置触发时间  
             Timer.Tick += Timer_Tick;
             Timer.Start();
@@ -109,10 +110,12 @@ namespace serialGraph
         private List<int> xList = new List<int>();
         private void InitLines()
         {
+            xList.Clear();
             for (int i = 0; i < DataBinding._DataBinding.Configs.Length; i++)
             {
                 xList.Add(i);
             }
+            Lines.Children.Clear();
             foreach (var line in DataBinding._DataBinding.Configs.GraphConfigs)
             {
                 LineGraph lineGraph = new LineGraph();
@@ -128,6 +131,12 @@ namespace serialGraph
                 lineGraph.Plot(xList, line.Data);
                 Lines.Children.Add(lineGraph);
             }
+
+            //图像设置
+            D3Chart.PlotOriginX = DataBinding._DataBinding.Configs.OX;
+            D3Chart.PlotOriginY = DataBinding._DataBinding.Configs.OY;
+            D3Chart.PlotWidth = DataBinding._DataBinding.Configs.Length;
+            D3Chart.PlotHeight = DataBinding._DataBinding.Configs.Height;
         }
 
         private bool Pause = false;
@@ -154,7 +163,41 @@ namespace serialGraph
             if (!DataBinding._DataBinding.SerialPort.IsOpen)
             {
                 DataBinding._DataBinding.Configs.PortName = SerialPortComboBox.SelectedItem as string;
-                DataBinding._DataBinding.Configs.BaudRate = (int)BaudRateComboBox.SelectedItem;
+
+                if (UserBaudRateTextBox.Visibility != Visibility.Collapsed)
+                {
+                    int baudrate;
+                    if(int.TryParse(UserBaudRateTextBox.Text, out baudrate))
+                    {
+                        DataBinding._DataBinding.Configs.BaudRate = baudrate;
+                        bool isNew = true;
+                        foreach (var item in DataBinding._DataBinding.Configs.BaudRates)
+                        {
+                            if(item == baudrate)
+                            {
+                                isNew = false;
+                                break;
+                            }
+                        }
+                        if (isNew)
+                        {
+                            DataBinding._DataBinding.Configs.BaudRates.Add(baudrate);
+                            DataBinding._DataBinding.Configs.BaudRates.Sort();
+                        }
+                    }
+                    else
+                    {
+                        UserBaudRateTextBox.Text = 115200.ToString();
+                        DataBinding._DataBinding.Configs.BaudRate = 115200;
+                        MessageBox.Show("转换失败, 默认设置为115200");
+                    }
+                }
+                else
+                {
+                    DataBinding._DataBinding.Configs.BaudRate = (int)BaudRateComboBox.SelectedItem;
+                }
+
+
                 DataBinding._DataBinding.Configs.DataBits = (int)DataBitsComboBox.SelectedItem;
                 DataBinding._DataBinding.Configs.Parity = ParityComboBoxItem.SelectedItem as string;
                 DataBinding._DataBinding.Configs.StopBits = StopBitsComboBoxItem.SelectedItem as string;
@@ -194,10 +237,41 @@ namespace serialGraph
                     //确定后返回,重新设置图像
                     Timer.Stop();
                     DataBinding._DataBinding.SerialPort.DataReceived -= DataBinding._DataBinding.SerialPort_DataReceived;
+                    Thread.Sleep(20);
+                    DataBinding._DataBinding.Configs.Length = graphComfigs.NewConfigs.Length;
+                    DataBinding._DataBinding.Configs.Height = graphComfigs.NewConfigs.Height;
+                    DataBinding._DataBinding.Configs.OX = graphComfigs.NewConfigs.OX;
+                    DataBinding._DataBinding.Configs.OY = graphComfigs.NewConfigs.OY;
+                    lock (DataBinding.locker)
+                    {
+                        DataBinding._DataBinding.Configs.GraphConfigs.Clear();
+                        foreach (var item in graphComfigs.NewConfigs.GraphConfigs)
+                        {
+                            DataBinding._DataBinding.Configs.GraphConfigs.Add(item);
+                        }
+                    }
+                    InitLines();
+                    DataBinding._DataBinding.WriteConfig();
 
-
-                    //SerialPort.DataReceived += SerialPort_DataReceived;
+                    Timer.Start();
+                    DataBinding._DataBinding.SerialPort.DataReceived += DataBinding._DataBinding.SerialPort_DataReceived;
                 }
+            }
+        }
+
+
+        private void UserBaudRate_Click(object sender, RoutedEventArgs e)
+        {
+
+            if ((bool)UserBaudRateButton.IsChecked)
+            {
+                UserBaudRateTextBox.Visibility = Visibility.Visible;
+                BaudRateComboBox.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                UserBaudRateTextBox.Visibility = Visibility.Collapsed;
+                BaudRateComboBox.Visibility = Visibility.Visible;
             }
         }
     }
