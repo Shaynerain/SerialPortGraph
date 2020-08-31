@@ -9,7 +9,7 @@
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
                       mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Title="波形显示工具" Height="600" Width="800">
+        Title="串口波形显示工具" Height="600" Width="800">
     <!--<Controls:MetroWindow.DataContext>
         <local:DataBinding.></local:DataBinding.>
     </Controls:MetroWindow.DataContext>-->
