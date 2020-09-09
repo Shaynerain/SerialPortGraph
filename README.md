@@ -2,6 +2,10 @@
 
 显示串口波形，按照指定格式发送，根据收到的数据绘制波形
 
+![](https://github.com/Shaynerain/SerialPortGraph/blob/master/s.jpg)
+
+![](https://github.com/Shaynerain/SerialPortGraph/blob/master/w.jpg)
+
 ## 编译环境
 
 - VS2019
