@@ -396,7 +396,13 @@ namespace serialGraph
                 str_temp += str;
             }
             if(!IsDataUpdate)
-                DataReceive += str;
+            {
+                string temp = DataReceive;
+                temp += str;
+                if (temp.Length > 15000)
+                    temp = temp.Substring(0, 10000);
+                DataReceive = temp;
+            }
             ReCount += str.Length;
             if (str_temp.Contains("\r\n"))
             {
@@ -406,14 +412,20 @@ namespace serialGraph
                     {
                         int index = str_temp.IndexOf('=');
                         int flag = str_temp.IndexOf(';');
-                        if (index > -1 && flag > -1)
+                        //可能出现index>flag
+                        if (index > -1 && flag > -1 && index < flag)
                         {
                             string value;
                             value = str_temp.Substring(index + 1, flag - index - 1);
                             str_temp = str_temp.Substring(flag + 1);
-                            lock (locker)
+                            double dV;
+                            //格式可能错误，这里改用Try
+                            if(double.TryParse(value, out dV))
                             {
-                                line.tempData.Add(double.Parse(value));
+                                lock (locker)
+                                {
+                                    line.tempData.Add(dV);
+                                }
                             }
                         }
                     }
