@@ -187,6 +187,9 @@
     <Compile Include="SelecteColor.xaml.cs">
       <DependentUpon>SelecteColor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControl1.xaml.cs">
+      <DependentUpon>UserControl1.xaml</DependentUpon>
+    </Compile>
     <Compile Include="VisibilityToCheckedConverter.cs" />
     <Page Include="GraphComfigs.xaml">
       <SubType>Designer</SubType>
@@ -205,6 +208,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="SelecteColor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControl1.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

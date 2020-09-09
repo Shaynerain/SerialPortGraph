@@ -45,5 +45,7 @@
 
 两个波形：Line1=0; Line2=0;\r\n
 
+建议多个指令之间添加延时，测试环境是1ms
+
 可参照此处发送:https://github.com/Shaynerain/STM32-COMP-DEMO
 

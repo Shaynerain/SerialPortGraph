@@ -180,6 +180,9 @@
                     </StackPanel>
                 </Grid>
             </Controls:MetroTabItem>
+            <Controls:MetroTabItem Header="帮助">
+                <local:UserControl1></local:UserControl1>
+            </Controls:MetroTabItem>
         </Controls:MetroAnimatedSingleRowTabControl>
     </Grid>
 </Controls:MetroWindow>
